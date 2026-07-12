@@ -11,3 +11,4 @@ if uploaded_file is not None:
     logs = uploaded_file.read().decode("utf-8")
     st.success("Log file uploaded successfully!")
     st.text(logs)
+
