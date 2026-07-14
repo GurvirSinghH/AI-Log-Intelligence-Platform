@@ -1,5 +1,6 @@
 import streamlit as st
 import log_parser
+import analyzer
 st.title("AI Log Intelligence Platform")
 uploaded_file = st.file_uploader(
     "Upload your log file", type=["log", "txt"]
@@ -14,3 +15,5 @@ if uploaded_file is not None:
     parsed_logs_df = log_parser.parse_logs(logs)
     st.dataframe(parsed_logs_df, use_container_width=True)
 
+    analysis_stats = analyzer.analyze_log(parsed_logs_df)
+    st.data_editor(analysis_stats, use_container_width=True)
