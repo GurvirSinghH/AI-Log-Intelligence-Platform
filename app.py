@@ -1,6 +1,7 @@
 import streamlit as st
 import log_parser
 import analyzer
+import visualizer
 st.title("AI Log Intelligence Platform")
 uploaded_file = st.file_uploader(
     "Upload your log file", type=["log", "txt"]
@@ -17,3 +18,11 @@ if uploaded_file is not None:
 
     analysis_stats = analyzer.analyze_log(parsed_logs_df)
     st.data_editor(analysis_stats, use_container_width=True)
+
+    fig1 = visualizer.plot_process_distribution(parsed_logs_df)
+    fig2 = visualizer.plot_host_distribution(parsed_logs_df)
+    fig3 = visualizer.plot_message_distribution(parsed_logs_df)
+
+    st.plotly_chart(fig1)
+    st.plotly_chart(fig2)
+    st.plotly_chart(fig3)
