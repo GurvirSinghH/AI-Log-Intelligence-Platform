@@ -14,7 +14,8 @@ if uploaded_file is not None:
     st.success("Log file uploaded successfully!")
     
     parsed_logs_df = log_parser.parse_logs(logs)
-    st.dataframe(parsed_logs_df, use_container_width=True)
+    st.write(f"Total Parsed Logs: {len(parsed_logs_df)}")
+    st.dataframe(parsed_logs_df.head(50), width="stretch")
 
     analysis_stats = analyzer.analyze_log(parsed_logs_df)
     st.data_editor(analysis_stats, use_container_width=True)

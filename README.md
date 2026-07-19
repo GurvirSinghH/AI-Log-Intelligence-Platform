@@ -10,13 +10,12 @@ An AI_powered platform for analyzing system and application logs using Machine L
 - [x] Streamlit application created
 - [x] Log file upload implemented
 - [x] Log parsing
-- [x] Log analysis (statistics)
+- [x] Parser improvements (Process, Module, PID extraction)
+- [x] Log analysis
 - [x] Log search
 - [x] Interactive visualizations
-- [ ] Parser improvements (PID & process extraction)
 - [ ] Data preprocessing
 - [ ] Anomaly detection
 - [ ] Error clustering
 - [ ] Incident summarization
 - [ ] Root cause analysis
-- [ ] Multi-format log support
