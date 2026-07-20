@@ -2,8 +2,6 @@
 
 An AI_powered platform for analyzing system and application logs using Machine Learning and Large Language Models.
 
-## Current Progress 
-
 ## Current Progress
 
 - [x] Project initialized
@@ -14,8 +12,8 @@ An AI_powered platform for analyzing system and application logs using Machine L
 - [x] Log analysis
 - [x] Log search
 - [x] Interactive visualizations
-- [ ] Data preprocessing
-- [ ] Anomaly detection
+- [x] Feature engineering
+- [x] Anomaly detection (Isolation Forest)
 - [ ] Error clustering
 - [ ] Incident summarization
 - [ ] Root cause analysis
