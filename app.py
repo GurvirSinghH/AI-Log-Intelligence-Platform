@@ -39,7 +39,7 @@ def cluster_anomalies(scored_df):
 
 #sidebar
 with st.sidebar:
-    st.header("📊 Log Intelligence")
+    st.header("Log Intelligence")
     st.caption("Upload a Linux syslog file to parse, analyze, and detect anomalies.")
     uploaded_file = st.file_uploader("Log file", type=["log", "txt"])
     st.divider()
@@ -122,7 +122,7 @@ with tab_logs:
     st.caption("Logs parsed into structured fields. Search filters by message text.")
 
     search_term = st.text_input(
-        "🔎 Search messages", placeholder="e.g. authentication failure"
+        "Search messages", placeholder="e.g. authentication failure"
     )
     filtered = search.search_logs(display_df, search_term)
     if search_term:
