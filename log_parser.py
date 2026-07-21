@@ -1,28 +1,31 @@
-import pandas as pd
 import re
+
+import pandas as pd
+
+# Compiled once at import time instead of on every call / Streamlit rerun.
+LOG_PATTERN = re.compile(
+    r'(?P<month>Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+'
+    r'(?P<day>\d{1,2})\s+'
+    r'(?P<time>\d{2}:\d{2}:\d{2})\s+'
+    r'(?P<host>\S+)\s+'
+    r'(?P<process>[^(]+)\((?P<module>[^)]+)\)\[(?P<pid>\d+)\]:\s+'
+    r'(?P<message>.+)'
+)
+
+COLUMNS = ["month", "day", "time", "host", "process", "module", "pid", "message"]
+
+
 def parse_logs(logs):
-    """
-    This function is responsible for parsing the input data and extracting relevant information.
-    It processes the data according to predefined rules and returns a structured output.
-    """
-    parsed_logs = []
+    """Parse raw syslog text into a structured DataFrame.
 
-    pattern = re.compile(r'(?P<month>Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(?P<day>\d{1,2})\s+(?P<time>\d{2}:\d{2}:\d{2})\s+(?P<host>\S+)\s+(?P<process>[^(]+)\((?P<module>[^)]+)\)\[(?P<pid>\d+)\]:\s+(?P<message>.+)')
-    matches = []
-    for lines in logs.splitlines():
-        matches.extend(pattern.finditer(lines))
-    for lines in logs.splitlines():
-
-        for match in matches:
-            parsed_logs.append({
-                "month": match.group("month"),
-                "day": match.group("day"),
-                "time": match.group("time"),
-                "host": match.group("host"),
-                "process": match.group("process"),
-                "module": match.group("module"),
-                "pid": match.group("pid"),
-                "message": match.group("message")
-            })
-    
-    return pd.DataFrame(parsed_logs)
+    Each line is scanned exactly once and matched at most once; lines that do
+    not fit the syslog pattern are skipped. Always returns a DataFrame with the
+    expected columns (empty if nothing matched) so downstream code can rely on
+    the schema.
+    """
+    parsed_logs = [
+        match.groupdict()
+        for line in logs.splitlines()
+        if (match := LOG_PATTERN.search(line))
+    ]
+    return pd.DataFrame(parsed_logs, columns=COLUMNS)

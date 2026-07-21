@@ -1,20 +1,27 @@
-from sklearn.preprocessing import LabelEncoder
 import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+
+CATEGORICAL_COLUMNS = ["process", "module", "host"]
+FEATURE_COLUMNS = ["process", "module", "host", "pid", "message_length", "hour"]
+
 
 def encode_categorical_features(df):
     features = df.copy()
-
-    process_encoder = LabelEncoder()
-    module_encoder = LabelEncoder()
-    host_encoder = LabelEncoder()
-    features['process'] = process_encoder.fit_transform(features['process'])
-    features['module'] = module_encoder.fit_transform(features['module'])
-    features['host'] = host_encoder.fit_transform(features['host'])
+    for column in CATEGORICAL_COLUMNS:
+        features[column] = LabelEncoder().fit_transform(features[column].astype(str))
     return features
 
+
 def create_features(df):
+    """Turn parsed logs into a purely numeric feature matrix for the models.
+
+    Time and PID parsing are error-tolerant: malformed values become 0 instead
+    of raising, so a single bad line can never take down the whole pipeline.
+    """
     features = encode_categorical_features(df)
-    features['message_length'] = features['message'].apply(len)
-    features['hour'] = pd.to_datetime(features['time'], format="%H:%M:%S").dt.hour
-    features['pid'] = features['pid'].astype(int)
-    return features[['process', 'module', 'host','pid' ,'message_length', 'hour']]
+    features["message_length"] = df["message"].str.len()
+    features["hour"] = (
+        pd.to_datetime(df["time"], format="%H:%M:%S", errors="coerce").dt.hour.fillna(0).astype(int)
+    )
+    features["pid"] = pd.to_numeric(df["pid"], errors="coerce").fillna(0).astype(int)
+    return features[FEATURE_COLUMNS]
