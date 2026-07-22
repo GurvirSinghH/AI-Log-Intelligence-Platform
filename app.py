@@ -40,24 +40,46 @@ def cluster_anomalies(scored_df):
 #sidebar
 with st.sidebar:
     st.header("Log Intelligence")
-    st.caption("Upload a Linux syslog file to parse, analyze, and detect anomalies.")
-    uploaded_file = st.file_uploader("Log file", type=["log", "txt"])
+    st.caption("Upload or paste a Linux syslog to parse, analyze, and detect anomalies.")
+
+    input_method = st.radio("Input method", ["Upload log file", "Paste log text"])
+
+    if input_method == "Upload log file":
+        uploaded_file = st.file_uploader("Log file", type=["log", "txt"])
+        pasted_text = None
+    else:
+        uploaded_file = None
+        pasted_text = st.text_area(
+            "Log text",
+            height=300,
+            placeholder=(
+                "Jun 14 15:16:01 server1 sshd[1234]: authentication failure\n"
+                "Jun 14 15:16:03 server1 sshd[1234]: invalid user root\n"
+                "Jun 14 15:16:08 server1 sudo[521]: session opened"
+            ),
+        )
+
     st.divider()
     st.caption("Built with Streamlit · scikit-learn · Plotly")
 
 
 st.title("AI Log Intelligence Platform")
 
-if uploaded_file is None:
-    st.info("Upload a `.log` or `.txt` syslog file from the sidebar to begin.")
-    st.stop()
-
-#read+parse
-try:
-    raw_text = uploaded_file.read().decode("utf-8", errors="replace")
-except Exception as exc:  # pragma: no cover - defensive
-    st.error(f"Could not read the uploaded file: {exc}")
-    st.stop()
+#resolve the selected input into a single raw_text for the shared pipeline
+if input_method == "Upload log file":
+    if uploaded_file is None:
+        st.info("Upload a `.log` or `.txt` syslog file from the sidebar to begin.")
+        st.stop()
+    try:
+        raw_text = uploaded_file.read().decode("utf-8", errors="replace")
+    except Exception as exc:  # pragma: no cover - defensive
+        st.error(f"Could not read the uploaded file: {exc}")
+        st.stop()
+else:
+    if not pasted_text or not pasted_text.strip():
+        st.info("Please paste some log entries to begin analysis.")
+        st.stop()
+    raw_text = pasted_text
 
 with st.spinner("Parsing logs..."):
     parsed_df = load_and_parse(raw_text)
