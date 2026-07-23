@@ -40,7 +40,7 @@ def cluster_anomalies(scored_df):
 #sidebar
 with st.sidebar:
     st.header("Log Intelligence")
-    st.caption("Upload or paste a Linux syslog to parse, analyze, and detect anomalies.")
+    st.caption("Upload a .log or .txt file or paste log text to analyze.")
 
     input_method = st.radio("Input method", ["Upload log file", "Paste log text"])
 
@@ -146,11 +146,22 @@ with tab_logs:
     search_term = st.text_input(
         "Search messages", placeholder="e.g. authentication failure"
     )
+    preview_rows = st.select_slider(
+        "Rows to preview", options=[100, 500, 1000, 5000], value=1000
+    )
+
+    # Search runs over the full frame; only a capped preview is serialized to the
+    # browser so large logs never exceed Streamlit's message size limit.
     filtered = search.search_logs(display_df, search_term)
     if search_term:
         st.info(f"{len(filtered):,} of {total_logs:,} entries match “{search_term}”.")
 
-    st.dataframe(filtered, width="stretch", height=420)
+    shown = min(preview_rows, len(filtered))
+    st.caption(
+        f"Showing the first {shown:,} rows out of {len(filtered):,} "
+        f"{'matching' if search_term else 'total parsed'} log entries."
+    )
+    st.dataframe(filtered.head(preview_rows), width="stretch", height=420)
 
 with tab_charts:
     st.subheader("Log Distributions")

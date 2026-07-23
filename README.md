@@ -59,6 +59,8 @@ You need Python 3.11 or newer.
 ```
 git clone <your-repository-url>
 cd AI-Log-Intelligence-Platform
+python -m venv venv   
+venv\Scripts\activate
 pip install -r requirements.txt
 streamlit run app.py
 ```
@@ -73,10 +75,37 @@ GOOGLE_API_KEY=your_api_key_here
 
 A free key can be created from Google AI Studio. The rest of the app works without a key, so this step is only needed for the report.
 
+## Supported Log Formats
+
+The AI Log Intelligence Platform automatically detects the uploaded log format and parses it without requiring any manual selection.
+
+| Log Format | Description | Status |
+|------------|-------------|:------:|
+| Linux Authentication Log (`auth.log`) | Authentication events, SSH logins, sudo activity, PAM events | ✅ |
+| Linux Syslog | General Linux system and service logs | ✅ |
+| Apache Access Log | HTTP requests, status codes, client IPs, URLs | ✅ |
+| Apache Error Log | Apache server errors, warnings, process information | ✅ |
+
+
+## Supported File Types
+
+The platform currently accepts the following input formats:
+
+- `.log`
+- `.txt`
+
+
+## Supported Input Methods
+
+Users can analyze logs using either of the following methods:
+
+- Upload a log file (`.log` or `.txt`)
+- Paste raw log text directly into the application
+
 ## How to Use
 
 1. Start the app with streamlit run app.py.
-2. Upload a log file from the sidebar. A sample file is included in the logs folder if you just want to try it out.
+2. Upload a log file from the sidebar or paste logs in the text box. Sample files are included in the logs folder if you just want to try it out.
 3. Open the Overview tab to see the statistics.
 4. Open the Parsed Logs tab to see the structured entries. You can also search messages here.
 5. Open the Visualizations tab to see the charts.
