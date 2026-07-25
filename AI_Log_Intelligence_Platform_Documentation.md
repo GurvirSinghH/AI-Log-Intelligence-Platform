@@ -1,22 +1,14 @@
 # AI Log Intelligence Platform
 
-## Project Documentation
+**Project Name:** AI Log Intelligence Platform
 
-<br>
+**Author:** Gurvir Singh
 
-**Project Title:** AI Log Intelligence Platform
+**Department:** B.Tech Computer Science and Engineering (AI and Data Science)
 
-**Student Name:** Gurvir Singh
+**College:** GNA University
 
-**Roll Number:** _[Your Roll Number]_
-
-**Department:** B.Tech Computer Science and Engineering (AI & Data Science)
-
-**Guide:** _[Guide Name]_
-
-**College:** _[College Name]_
-
-**Academic Year:** 2025 – 2026
+**Academic Year:** 2024 – 2028
 
 ---
 
@@ -624,7 +616,7 @@ The app opens with a title, a sidebar for input, and six tabs across the top. Ea
 
 The sidebar is where everything starts. The user chooses between uploading a file and pasting text, then provides the log. A short caption explains what to do.
 
-![Upload](screenshots/upload.png)
+![Upload](screenshots/dashboard.png)
 
 ## 16.2 Parsed Logs tab
 
