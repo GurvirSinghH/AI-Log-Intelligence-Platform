@@ -2,11 +2,12 @@
 
 ## Overview
 
-AI Log Intelligence Platform is a Streamlit application for analyzing Linux system log files. You upload a log file and the app parses it into a structured table, shows some basic statistics, draws a few charts, and then uses two machine learning models to find and group unusual log entries.
+AI Log Intelligence Platform is a machine-learning-based system log analysis tool that transforms raw Linux logs into structured data and applies anomaly detection and clustering to identify unusual events.
+The platform combines log parsing, statistical analysis, search, visualization, feature engineering, Isolation Forest, and K-Means clustering in an interactive Streamlit interface.
 
 The anomaly detection is done with Isolation Forest, and the anomalies are grouped using K-Means clustering. There is also an optional tab that asks a language model (Google Gemini) to write a short incident report based on the results.
 
-I built this as my final-year project to learn how machine learning can be applied to log analysis and to get some practice with the tools listed below.
+I built this project to explore how machine learning can be applied to system log analysis and to gain practical experience with data processing, anomaly detection, clustering, and visualization.
 
 ## Features
 
@@ -159,19 +160,6 @@ The screenshots below are placeholders. Add your own images to a screenshots fol
 - Let the user choose the number of clusters
 - Export the results and the report to a file
 - Add live or real-time log monitoring
-
-## Learning Outcomes
-
-Some of the things I learned while building this project:
-
-- Writing regular expressions to parse text
-- Cleaning and organizing data with Pandas
-- Turning raw data into features for machine learning
-- How Isolation Forest can be used for anomaly detection
-- How K-Means clustering groups similar data
-- Building an interactive app with Streamlit
-- Creating charts with Plotly
-- Calling a language model API and keeping the API key out of the code
 
 ## Limitations
 
