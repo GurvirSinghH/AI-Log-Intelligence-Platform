@@ -1,5 +1,9 @@
 # AI Log Intelligence Platform
 
+## Current status
+**Active Development**
+The current version supports log parsing, statistical analysis, search, visualization, feature engineering, anomaly detection using Isolation Forest, and clustering using K-Means. Further development is focused on improving detection quality, supporting additional log formats, and making the analysis more robust.
+
 ## Overview
 
 AI Log Intelligence Platform is a machine-learning-based system log analysis tool that transforms raw Linux logs into structured data and applies anomaly detection and clustering to identify unusual events.
