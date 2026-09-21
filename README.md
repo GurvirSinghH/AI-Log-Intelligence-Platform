@@ -62,10 +62,11 @@ Clustering
 You need Python 3.11 or newer.
 
 ```
-git clone <your-repository-url>
+git clone https://github.com/GurvirSinghH/AI-Log-Intelligence-Platform.git
 cd AI-Log-Intelligence-Platform
-python -m venv venv   
-venv\Scripts\activate
+python -m venv venv
+venv\Scripts\activate          # Windows
+source venv/bin/activate       # Mac/Linux
 pip install -r requirements.txt
 streamlit run app.py
 ```
@@ -159,7 +160,7 @@ The screenshots below are placeholders. Add your own images to a screenshots fol
 
 ## Future Improvements
 
-- Support more log formats instead of only this one syslog pattern
+- Support more log formats, such as Windows Event Logs and cloud audit logs (AWS CloudTrail)
 - Improve the anomaly detection, for example by tuning the parameters or trying other methods
 - Let the user choose the number of clusters
 - Export the results and the report to a file
@@ -167,7 +168,7 @@ The screenshots below are placeholders. Add your own images to a screenshots fol
 
 ## Limitations
 
-- It only supports the Linux syslog format that matches the parser's pattern. Lines in other formats are skipped.
+- It supports four formats: Linux auth.log, Linux syslog, Apache access logs and Apache error logs. Lines that don't match any of these are skipped.
 - It works on uploaded files, not on live log streams.
 - The anomaly detection is unsupervised and assumes that a small percentage of the logs are anomalies. There is no accuracy score, and the results depend a lot on the input data.
 - The whole file is loaded into memory, so very large files are limited by the available RAM.
