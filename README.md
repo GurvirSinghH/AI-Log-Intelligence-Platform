@@ -22,6 +22,8 @@ I built this project to explore how machine learning can be applied to system lo
 - Search log messages by keyword
 - Interactive charts built with Plotly
 - Feature engineering to prepare the data for the models
+- Log template mining with Drain, which groups similar log lines into templates such as `Failed password for <*> from <IP>`
+- Templates tab showing every template, how often it appears, and how many of its lines were flagged, with the rarest first
 - Anomaly detection with Isolation Forest
 - Clustering of anomalies with K-Means
 - Optional AI-generated incident report using Google Gemini
@@ -52,6 +54,7 @@ Clustering
 - Streamlit (user interface)
 - Pandas (data handling)
 - Scikit-learn (Isolation Forest and K-Means)
+- Drain3 (log template mining)
 - Plotly (charts)
 - Regex, using Python's re module (log parsing)
 - Google Gemini through the google-genai package (optional incident report)
@@ -126,6 +129,7 @@ Users can analyze logs using either of the following methods:
 - analyzer.py — calculates the summary statistics from the parsed logs.
 - search.py — filters the log messages by a search term.
 - visualizer.py — builds the Plotly charts (process, host, message, and anomaly plots).
+- template_miner.py — groups log messages into templates with Drain (drain3), masking IP addresses and numbers first.
 - feature_engineering.py — turns the parsed logs into numeric features for the models.
 - anomaly_detector.py — runs Isolation Forest and marks each entry as normal or anomalous.
 - clustering.py — runs K-Means to group the anomalies into clusters.
@@ -137,6 +141,8 @@ Users can analyze logs using either of the following methods:
 ## Machine Learning Pipeline
 
 ```
+Drain Template Mining
+      ↓
 Feature Engineering
       ↓
 Isolation Forest
@@ -144,7 +150,9 @@ Isolation Forest
 K-Means
 ```
 
-Feature engineering takes the parsed logs, which are mostly text, and turns them into numbers the models can use. The process, module, and host names are label encoded, and a few extra features are added, such as the message length and the hour taken from the timestamp.
+Drain template mining groups log lines that follow the same pattern. For example, "Failed password for root from 10.0.0.5" and "Failed password for admin from 192.168.1.9" both become the template `Failed password for <*> from <IP>`. IP addresses and numbers are masked before grouping, and the final template for each line is stored alongside the parsed logs.
+
+Feature engineering takes the parsed logs, which are mostly text, and turns them into numbers the models can use. The process, module, and host names are label encoded, and a few extra features are added: the message length, the hour taken from the timestamp, and the template frequency, which is the share of all lines that use the same template. Rare templates get very low values, and that makes them easy for Isolation Forest to separate.
 
 Isolation Forest is an unsupervised model, which means it does not need labeled examples. It works by randomly splitting the data and measuring how easily each point can be separated from the rest. Points that are separated quickly are treated as anomalies.
 
