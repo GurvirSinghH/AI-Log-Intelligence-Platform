@@ -39,6 +39,8 @@ Parse Logs
       ↓
 Generate Statistics
       ↓
+Drain Template Mining
+      ↓
 Visualize Logs
       ↓
 Feature Engineering
@@ -113,14 +115,15 @@ Users can analyze logs using either of the following methods:
 
 ## How to Use
 
-1. Start the app with streamlit run app.py.
+1. Start the app with run app.py.
 2. Upload a log file from the sidebar or paste logs in the text box. Sample files are included in the logs folder if you just want to try it out.
 3. Open the Overview tab to see the statistics.
 4. Open the Parsed Logs tab to see the structured entries. You can also search messages here.
-5. Open the Visualizations tab to see the charts.
-6. Open the Anomaly Detection tab to see which entries were flagged as unusual.
-7. Open the Clustering tab to see how the anomalies were grouped.
-8. (Optional) Open the AI Report tab. If your API key is set, click the button to generate a written summary.
+5. Open the Templates tab to see how the logs were grouped into templates. The rarest templates are at the top.
+6. Open the Visualizations tab to see the charts.
+7. Open the Anomaly Detection tab to see which entries were flagged as unusual.
+8. Open the Clustering tab to see how the anomalies were grouped.
+9. (Optional) Open the AI Report tab. If your API key is set, click the button to generate a written summary.
 
 ## Project Structure
 
