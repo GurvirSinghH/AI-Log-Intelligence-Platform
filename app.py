@@ -19,7 +19,11 @@ st.set_page_config(
 
 @st.cache_data(show_spinner=False)
 def load_and_parse(raw_text):
-    return log_parser.parse_logs(raw_text)
+    parsed = log_parser.parse_logs(raw_text)
+    if parsed.empty:
+        return parsed
+    # Attach Drain templates once, so both the model and the tables can use them
+    return feature_engineering.add_templates(parsed)
 
 
 @st.cache_data(show_spinner=False)
@@ -117,8 +121,8 @@ anomaly_rate = (n_anomalies / total_logs * 100) if total_logs else 0.0
 
 
 #tabs
-tab_overview, tab_logs, tab_charts, tab_anomaly, tab_cluster, tab_report = st.tabs(
-    ["Overview", "Parsed Logs", "Visualizations", "Anomaly Detection", "Clustering", "AI Report"]
+tab_overview, tab_logs, tab_templates, tab_charts, tab_anomaly, tab_cluster, tab_report = st.tabs(
+    ["Overview", "Parsed Logs", "Templates", "Visualizations", "Anomaly Detection", "Clustering", "AI Report"]
 )
 
 with tab_overview:
@@ -162,6 +166,35 @@ with tab_logs:
         f"{'matching' if search_term else 'total parsed'} log entries."
     )
     st.dataframe(filtered.head(preview_rows), width="stretch", height=420)
+
+with tab_templates:
+    st.subheader("Log Templates (Drain)")
+    st.caption(
+        "Similar log lines grouped into templates. Variable parts like usernames, "
+        "IPs and numbers are replaced with placeholders. Rarest templates are shown first."
+    )
+
+    template_summary = (
+        display_df.groupby("template")
+        .agg(
+            count=("template", "size"),
+            anomalies=("anomaly", lambda s: int((s == 1).sum())),
+        )
+        .reset_index()
+    )
+    template_summary["share_%"] = (template_summary["count"] / total_logs * 100).round(2)
+    template_summary = template_summary.sort_values("count")
+
+    t1, t2 = st.columns(2)
+    t1.metric("Unique Templates", f"{len(template_summary):,}")
+    t2.metric("Templates Seen Only Once", f"{(template_summary['count'] == 1).sum():,}")
+
+    st.dataframe(
+        template_summary[["template", "count", "share_%", "anomalies"]],
+        width="stretch",
+        height=420,
+        hide_index=True,
+    )
 
 with tab_charts:
     st.subheader("Log Distributions")
