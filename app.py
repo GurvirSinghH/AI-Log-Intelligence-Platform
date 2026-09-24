@@ -1,5 +1,4 @@
 import streamlit as st
-
 import analyzer
 import anomaly_detector
 import clustering
@@ -9,6 +8,7 @@ import search
 import visualizer
 import prompt_builder
 import llm_summary
+import evtx_parser
 
 st.set_page_config(
     page_title="AI Log Intelligence Platform",
@@ -25,6 +25,12 @@ def load_and_parse(raw_text):
     # Attach Drain templates once, so both the model and the tables can use them
     return feature_engineering.add_templates(parsed)
 
+@st.cache_data(show_spinner=False)
+def load_and_parse_evtx(evtx_bytes):
+    parsed = evtx_parser.parse_evtx_bytes(evtx_bytes)
+    if parsed.empty:
+        return parsed
+    return feature_engineering.add_templates(parsed)
 
 @st.cache_data(show_spinner=False)
 def build_features(parsed_df):
@@ -44,12 +50,12 @@ def cluster_anomalies(scored_df):
 #sidebar
 with st.sidebar:
     st.header("Log Intelligence")
-    st.caption("Upload a .log or .txt file or paste log text to analyze.")
+    st.caption("Upload a .log, .txt or .evtx file or paste log text to analyze.")
 
     input_method = st.radio("Input method", ["Upload log file", "Paste log text"])
 
     if input_method == "Upload log file":
-        uploaded_file = st.file_uploader("Log file", type=["log", "txt"])
+        uploaded_file = st.file_uploader("Log file", type=["log", "txt", "evtx"])
         pasted_text = None
     else:
         uploaded_file = None
@@ -70,12 +76,16 @@ with st.sidebar:
 st.title("AI Log Intelligence Platform")
 
 #resolve the selected input into a single raw_text for the shared pipeline
+evtx_bytes = None
 if input_method == "Upload log file":
     if uploaded_file is None:
-        st.info("Upload a `.log` or `.txt` syslog file from the sidebar to begin.")
+        st.info("Upload a `.log`, `.txt` or `.evtx` syslog file from the sidebar to begin.")
         st.stop()
     try:
-        raw_text = uploaded_file.read().decode("utf-8", errors="replace")
+        if uploaded_file.name.lower().endswith(".evtx"):
+            evtx_bytes = uploaded_file.getvalue()
+        else:
+            raw_text = uploaded_file.read().decode("utf-8", errors="replace")
     except Exception as exc:  # pragma: no cover - defensive
         st.error(f"Could not read the uploaded file: {exc}")
         st.stop()
@@ -86,7 +96,10 @@ else:
     raw_text = pasted_text
 
 with st.spinner("Parsing logs..."):
-    parsed_df = load_and_parse(raw_text)
+    if evtx_bytes is not None:
+        parsed_df = load_and_parse_evtx(evtx_bytes)
+    else:
+        parsed_df = load_and_parse(raw_text)
 
 if parsed_df.empty:
     st.warning(
