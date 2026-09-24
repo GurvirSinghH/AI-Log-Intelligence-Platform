@@ -22,6 +22,7 @@ I built this project to explore how machine learning can be applied to system lo
 - Search log messages by keyword
 - Interactive charts built with Plotly
 - Feature engineering to prepare the data for the models
+- Windows Event Log (`.evtx`) support, with the Event ID, outcome (Audit Success or Audit Failure) and event details extracted, and readable names for common IDs such as 4624 (successful logon), 4625 (failed logon) and 4688 (process created)
 - Log template mining with Drain, which groups similar log lines into templates such as `Failed password for <*> from <IP>`
 - Templates tab showing every template, how often it appears, and how many of its lines were flagged, with the rarest first
 - Anomaly detection with Isolation Forest
@@ -56,6 +57,7 @@ Clustering
 - Streamlit (user interface)
 - Pandas (data handling)
 - Scikit-learn (Isolation Forest and K-Means)
+- python-evtx (Windows Event Log parsing)
 - Drain3 (log template mining)
 - Plotly (charts)
 - Regex, using Python's re module (log parsing)
@@ -96,6 +98,7 @@ The AI Log Intelligence Platform automatically detects the uploaded log format a
 | Linux Syslog | General Linux system and service logs | ✅ |
 | Apache Access Log | HTTP requests, status codes, client IPs, URLs | ✅ |
 | Apache Error Log | Apache server errors, warnings, process information | ✅ |
+| Windows Event Log | `.evtx` | Binary Windows event log exported from Event Viewer (Security, System, Application) |
 
 
 ## Supported File Types
@@ -104,13 +107,13 @@ The platform currently accepts the following input formats:
 
 - `.log`
 - `.txt`
-
+- `.evtx`
 
 ## Supported Input Methods
 
 Users can analyze logs using either of the following methods:
 
-- Upload a log file (`.log` or `.txt`)
+- Upload a log file (`.log`, `.txt` or `.evtx`)
 - Paste raw log text directly into the application
 
 ## How to Use
@@ -118,12 +121,13 @@ Users can analyze logs using either of the following methods:
 1. Start the app with run app.py.
 2. Upload a log file from the sidebar or paste logs in the text box. Sample files are included in the logs folder if you just want to try it out.
 3. Open the Overview tab to see the statistics.
-4. Open the Parsed Logs tab to see the structured entries. You can also search messages here.
-5. Open the Templates tab to see how the logs were grouped into templates. The rarest templates are at the top.
-6. Open the Visualizations tab to see the charts.
-7. Open the Anomaly Detection tab to see which entries were flagged as unusual.
-8. Open the Clustering tab to see how the anomalies were grouped.
-9. (Optional) Open the AI Report tab. If your API key is set, click the button to generate a written summary.
+4. To try Windows logs, open Event Viewer, go to Windows Logs, then Security, click Filter Current Log and pick Last 24 hours, then click Save Filtered Log File As and save it as a .evtx file. Upload that file.
+5. Open the Parsed Logs tab to see the structured entries. You can also search messages here.
+6. Open the Templates tab to see how the logs were grouped into templates. The rarest templates are at the top.
+7. Open the Visualizations tab to see the charts.
+8. Open the Anomaly Detection tab to see which entries were flagged as unusual.
+9. Open the Clustering tab to see how the anomalies were grouped.
+10. (Optional) Open the AI Report tab. If your API key is set, click the button to generate a written summary.
 
 ## Project Structure
 
@@ -132,6 +136,7 @@ Users can analyze logs using either of the following methods:
 - analyzer.py — calculates the summary statistics from the parsed logs.
 - search.py — filters the log messages by a search term.
 - visualizer.py — builds the Plotly charts (process, host, message, and anomaly plots).
+- evtx_parser.py — reads binary Windows Event Log files (.evtx) and maps each event onto the same columns as the text parsers.
 - template_miner.py — groups log messages into templates with Drain (drain3), masking IP addresses and numbers first.
 - feature_engineering.py — turns the parsed logs into numeric features for the models.
 - anomaly_detector.py — runs Isolation Forest and marks each entry as normal or anomalous.
@@ -153,6 +158,7 @@ Isolation Forest
 K-Means
 ```
 
+Windows Event Logs are binary rather than text, so they are read with python-evtx and each event is mapped onto the same columns the text parsers produce: the Event ID becomes the process, the outcome (Audit Success or Audit Failure) becomes the module, and the event's data fields are joined into the message. Because of this, every later stage — statistics, charts, template mining, anomaly detection and clustering — works on Windows logs without any change. Parsing is capped at 20,000 events per file so a large log cannot freeze the app.
 Drain template mining groups log lines that follow the same pattern. For example, "Failed password for root from 10.0.0.5" and "Failed password for admin from 192.168.1.9" both become the template `Failed password for <*> from <IP>`. IP addresses and numbers are masked before grouping, and the final template for each line is stored alongside the parsed logs.
 
 Feature engineering takes the parsed logs, which are mostly text, and turns them into numbers the models can use. The process, module, and host names are label encoded, and a few extra features are added: the message length, the hour taken from the timestamp, and the template frequency, which is the share of all lines that use the same template. Rare templates get very low values, and that makes them easy for Isolation Forest to separate.
@@ -179,7 +185,7 @@ The screenshots below are placeholders. Add your own images to a screenshots fol
 
 ## Limitations
 
-- It supports four formats: Linux auth.log, Linux syslog, Apache access logs and Apache error logs. Lines that don't match any of these are skipped.
+- It supports five formats: Linux auth.log, Linux syslog, Apache access logs, Apache error logs and Windows Event Logs (.evtx). Text lines that don't match any of these are skipped.
 - It works on uploaded files, not on live log streams.
 - The anomaly detection is unsupervised and assumes that a small percentage of the logs are anomalies. There is no accuracy score, and the results depend a lot on the input data.
 - The whole file is loaded into memory, so very large files are limited by the available RAM.
